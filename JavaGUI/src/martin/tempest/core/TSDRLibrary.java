@@ -24,7 +24,7 @@ import java.util.List;
 import martin.tempest.core.exceptions.TSDRAlreadyRunningException;
 import martin.tempest.core.exceptions.TSDRException;
 import martin.tempest.core.exceptions.TSDRLibraryNotCompatible;
-import martin.tempest.gui.VideoMode;
+// import martin.tempest.gui.VideoMode;
 import martin.tempest.sources.TSDRSource;
 
 /**
@@ -41,7 +41,7 @@ public class TSDRLibrary {
 	/** The image that will be have its pixels written by the NDK */
 	private BufferedImage bimage;
 	/** A pointer to the pixels of {@link #bimage} */
-	private volatile int[] pixels;
+	private volatile int[] pixels;      // !!! context->obj_pixels in the NDK.c file. Used to pass the frame data 
 	
 	/** The desired direction of manual synchronisation */
 	public enum SYNC_DIRECTION {ANY, UP, DOWN, LEFT, RIGHT};
@@ -254,7 +254,7 @@ public class TSDRLibrary {
 	 */
 	public native boolean isRunning();
 	public native void setInvertedColors(boolean invertedEnabled);
-	public native void sync(int pixels, SYNC_DIRECTION dir);
+	public native void sync(int pixels, SYNC_DIRECTION dir);     // !!! this pixel is different from the bimage pointer int [] 
 	public native void setParam(PARAM param, long value) throws TSDRException;
 	public native void setParamDouble(PARAM_DOUBLE param, double value) throws TSDRException;
 	public native void setResolution(int height, double refreshrate) throws TSDRException;
@@ -428,8 +428,8 @@ public class TSDRLibrary {
 	final private void fixSize(final int x, final int y) {
 		if (bimage == null || bimage.getWidth() != x || bimage.getHeight() != y) {
 			try {
-				bimage = new BufferedImage(x, y, BufferedImage.TYPE_INT_RGB);
-				pixels = ((DataBufferInt) bimage.getRaster().getDataBuffer()).getData();
+				bimage = new BufferedImage(x, y, BufferedImage.TYPE_INT_RGB);     // ??? why RGB ???
+				pixels = ((DataBufferInt) bimage.getRaster().getDataBuffer()).getData();     // !!! point pixels to bimage buffer ??? used how 
 			} catch (Throwable t) {
 				t.printStackTrace();
 				System.err.flush(); System.out.flush();
@@ -475,7 +475,7 @@ public class TSDRLibrary {
 	 */
 	final private void notifyCallbacks() {
 		try {
-			for (final FrameReadyCallback callback : callbacks) callback.onFrameReady(this, bimage);
+			for (final FrameReadyCallback callback : callbacks) callback.onFrameReady(this, bimage);  // !!! bimage was not passed in, but changed somehow ???
 		} catch (Throwable t) {
 			t.printStackTrace();
 			System.err.flush(); System.out.flush();
