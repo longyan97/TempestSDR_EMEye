@@ -21,7 +21,7 @@ import java.awt.Toolkit;
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import javax.swing.JComboBox;
+// import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -29,7 +29,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JTextField;
-import javax.swing.DefaultComboBoxModel;
+// import javax.swing.DefaultComboBoxModel;
 
 import martin.tempest.core.TSDRLibrary;
 import martin.tempest.core.TSDRLibrary.PARAM;
@@ -206,7 +206,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		frmTempestSdr.addKeyListener(keyhook);
 		frmTempestSdr.setResizable(false);
 		frmTempestSdr.setTitle("TempestSDR");
-		frmTempestSdr.setBounds(100, 100, 810, 632);
+		frmTempestSdr.setBounds(50, 50, 1800, 900);
 		frmTempestSdr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frmTempestSdr.addMouseListener(new MouseAdapter() {
 			@Override
