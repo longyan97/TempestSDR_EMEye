@@ -111,7 +111,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private JSpinner spWidth;
 	private JSpinner spHeight;
 	@SuppressWarnings("rawtypes")
-	private JComboBox cbVideoModes;
+	// private JComboBox cbVideoModes;                   Useless for cameras
 	private JSpinner spFrequency;
 	private JLabel lblFrequency;
 	private JSlider slGain;
@@ -139,7 +139,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 
 	private final TSDRSource[] souces = TSDRSource.getAvailableSources();
 	private final JMenuItem[] souces_menues = new JMenuItem[souces.length];
-	private final VideoMode[] videomodes = VideoMode.getVideoModes();
+	// private final VideoMode[] videomodes = VideoMode.getVideoModes();
 
 	private volatile boolean auto_resolution = false;
 	private Integer auto_resolution_fps_id = null;
@@ -151,7 +151,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private volatile boolean plot_change_from_auto = false;
 	private volatile boolean spinner_change_from_auto = false;
 	
-	private boolean video_mode_change_manually_triggered = false;
+	// private boolean video_mode_change_manually_triggered = false;
 	
 	private int image_width = 1;
 	
@@ -197,7 +197,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		final int width_initial = prefs.getInt(PREF_WIDTH, 576);
 		final int height_initial = prefs.getInt(PREF_HEIGHT, 625);
 		final double framerate_initial = prefs.getDouble(PREF_FRAMERATE, framerate);
-		final int closest_videomode_id = VideoMode.findClosestVideoModeId(width_initial, height_initial, framerate_initial, videomodes);
+		// final int closest_videomode_id = VideoMode.findClosestVideoModeId(width_initial, height_initial, framerate_initial, videomodes);
 		final boolean heightlock_enabled = prefs.getBoolean(PREF_HEIGHT_LOCK, true);
 		
 		frmTempestSdr = new JFrame();
@@ -401,11 +401,11 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		btnReset.setBounds(749, 417, 41, 22);
 		frmTempestSdr.getContentPane().add(btnReset);
 		
-		cbVideoModes = new JComboBox();
-		cbVideoModes.setBounds(581, 70, 209, 22);
-		frmTempestSdr.getContentPane().add(cbVideoModes);
-		cbVideoModes.setModel(new DefaultComboBoxModel(videomodes));
-		if (closest_videomode_id != -1 && closest_videomode_id < videomodes.length && closest_videomode_id >= 0) cbVideoModes.setSelectedIndex(closest_videomode_id);
+		// cbVideoModes = new JComboBox();
+		// cbVideoModes.setBounds(581, 70, 209, 22);
+		// frmTempestSdr.getContentPane().add(cbVideoModes);
+		// cbVideoModes.setModel(new DefaultComboBoxModel(videomodes));
+		// if (closest_videomode_id != -1 && closest_videomode_id < videomodes.length && closest_videomode_id >= 0) cbVideoModes.setSelectedIndex(closest_videomode_id);
 		
 		JLabel lblWidth = new JLabel("Width:");
 		lblWidth.setBounds(581, 100, 65, 16);
@@ -659,16 +659,16 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 						prefs.putBoolean(PREF_HEIGHT_LOCK, tglbtnLockHeightAndFramerate.isSelected());
 					}
 				});
-		cbVideoModes.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				final VideoMode selected = (VideoMode) cbVideoModes.getSelectedItem();
-				for (int i = 0; i < videomodes.length; i++)
-					if (videomodes[i].equals(selected)) {
-						onVideoModeSelected(i);
-						return;
-					}
-			}
-		});
+		// cbVideoModes.addActionListener(new ActionListener() {
+		// 	public void actionPerformed(ActionEvent arg0) {
+		// 		final VideoMode selected = (VideoMode) cbVideoModes.getSelectedItem();
+		// 		for (int i = 0; i < videomodes.length; i++)
+		// 			if (videomodes[i].equals(selected)) {
+		// 				onVideoModeSelected(i);
+		// 				return;
+		// 			}
+		// 	}
+		// });
 		
 		frmTempestSdr.setFocusableWindowState(true);
 		frmTempestSdr.requestFocus();
@@ -735,10 +735,10 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		} catch (TSDRException e1) {}
 	}
 	
-	private void onVideoModeSelected(final int modeid) {
-		if (video_mode_change_manually_triggered) return;
-		onResolutionChange(modeid);
-	}
+	// private void onVideoModeSelected(final int modeid) {
+	// 	if (video_mode_change_manually_triggered) return;
+	// 	onResolutionChange(modeid);
+	// }
 	
 	private void setAreaAroundMouse() {
 		try {
@@ -801,33 +801,38 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		mSdrlib.sync(repeatssofar, dir);
 	}
 	
-	private void onResolutionChange(int id, double refreshrate, int height) {
-		if (id < 0 || id >= videomodes.length) return;
+	// private void onResolutionChange(int id, double refreshrate, int height) {
+	// 	if (id < 0 || id >= videomodes.length) return;
 		
-		final VideoMode mode = videomodes[id];
-		onResolutionChange(mode.width, height, refreshrate, id);
-	}
+	// 	final VideoMode mode = videomodes[id];
+	// 	onResolutionChange(mode.width, height, refreshrate, id);
+	// }
 	
-	private void onResolutionChange(int id) {
-		if (id < 0 || id >= videomodes.length) return;
+	// private void onResolutionChange(int id) {
+	// 	if (id < 0 || id >= videomodes.length) return;
 		
-		final VideoMode mode = videomodes[id];
-		onResolutionChange(mode.width, mode.height, mode.refreshrate, id);
-	}
+	// 	final VideoMode mode = videomodes[id];
+	// 	onResolutionChange(mode.width, mode.height, mode.refreshrate, id);
+	// }
 	
+	 
 	private void onResolutionChange(final double fps, final int height, final String msg) {
 		
-		final int modeid = VideoMode.findClosestVideoModeId(fps, height, videomodes);
-		if (modeid >= 0 && modeid < videomodes.length) {
-			onResolutionChange(modeid, fps, height);
-			visualizer.setOSD(String.format(msg, " "+videomodes[modeid]), OSD_TIME_LONG);
-		} else {
-			setFrameRate(fps);
-		}
+		// final int modeid = VideoMode.findClosestVideoModeId(fps, height, videomodes);
+		// if (modeid >= 0 && modeid < videomodes.length) {
+		// 	onResolutionChange(modeid, fps, height);
+		// 	visualizer.setOSD(String.format(msg, " "+videomodes[modeid]), OSD_TIME_LONG);
+		// } else {
+		// 	setFrameRate(fps);
+		// }
+
+		final int width = (Integer) spWidth.getValue();
+		onResolutionChange(width, height, framerate, 0);
 	}
 	
 	private void onResolutionChange(int width, int height, double framerate) {
-		onResolutionChange(width, height, framerate, VideoMode.findClosestVideoModeId(width, height, framerate, videomodes));
+		// onResolutionChange(width, height, framerate, VideoMode.findClosestVideoModeId(width, height, framerate, videomodes));
+		onResolutionChange(width, height, framerate, 0);
 	}
 	
 	private void onResolutionChange(int width, int height, double framerate, int closest_videomode_id) {
@@ -853,12 +858,12 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			prefs.putInt(PREF_HEIGHT, height);
 			spHeight.setValue(height);
 			
-			video_mode_change_manually_triggered = true;
-			if (closest_videomode_id >= 0 && closest_videomode_id < videomodes.length) {
-				cbVideoModes.setSelectedIndex(closest_videomode_id);
-				cbVideoModes.repaint();
-			}
-			video_mode_change_manually_triggered = false;
+			// video_mode_change_manually_triggered = true;
+			// if (closest_videomode_id >= 0 && closest_videomode_id < videomodes.length) {
+			// 	cbVideoModes.setSelectedIndex(closest_videomode_id);
+			// 	cbVideoModes.repaint();
+			// }
+			// video_mode_change_manually_triggered = false;
 		} catch (TSDRException e) {
 			displayException(frmTempestSdr, e);
 		} finally {

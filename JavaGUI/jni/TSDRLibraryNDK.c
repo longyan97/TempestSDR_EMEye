@@ -31,12 +31,12 @@ struct java_obj_context {
 
 struct java_context {
 		jobject obj;
-		jobject obj_pixels;
+		jobject obj_pixels;      // !!! pointer to the image frame in java
 		int pic_width;
 		int pic_height;
 		jmethodID fixSize;
 		jmethodID notifyCallbacks;
-		jint * pixels;
+		jint * pixels;   // !!! pointer to the image frame in C 
 		int pixelsize;
 	} typedef java_context_t;
 
@@ -208,7 +208,7 @@ void read_async(float *buf, int width, int height, void *ctx) {
 				context->pixels = (jint *) malloc(sizeof(jint) * newpixelsize);
 			else
 				context->pixels = (jint *) realloc((void *) context->pixels, sizeof(jint) * newpixelsize);
-		}
+		} 
 
 		assert(context->pixels != NULL);
 
@@ -226,11 +226,11 @@ void read_async(float *buf, int width, int height, void *ctx) {
 		const float val = *(buf++);
 		if (val > 0.0f && val <= 1.0f) {
 			const int col = (inverted) ? (255 - (int) (val * 255.0f)) : ((int) (val * 255.0f));
-			*(data++) = col | (col << 8) | (col << 16);
+			*(data++) = col | (col << 8) | (col << 16);           // !!! using the same value for  RGB channels but packed into a single interger 
 		} else if (val <= 0.0f) {
-			*(data++) = (inverted) ? (255 | (255 << 8) | (255 << 16)) : 0;
+			*(data++) = (inverted) ? (255 | (255 << 8) | (255 << 16)) : 0;      // !!! this should denote abnormal data. Render completly white or black images 
 		}
-#if PIXEL_SPECIAL_COLOURS_ENABLED
+#if PIXEL_SPECIAL_COLOURS_ENABLED     // debug purpose when fake data is fed in. ignore
 		else if (val == PIXEL_SPECIAL_VALUE_R) {
 			*(data++) = 255 << 16;
 		} else if (val == PIXEL_SPECIAL_VALUE_G) {
@@ -241,7 +241,7 @@ void read_async(float *buf, int width, int height, void *ctx) {
 			data++;
 		}
 #endif
-		else {
+		else {  // !!! saturated 
 			*(data++) = (inverted) ? 0 : (255 | (255 << 8) | (255 << 16));
 		}
 
@@ -252,7 +252,7 @@ void read_async(float *buf, int width, int height, void *ctx) {
 	//assert((*env)->GetArrayLength(env, context->obj_pixels) >= context->pixelsize);
 
 	// release elements#
-	(*env)->SetIntArrayRegion(env, context->obj_pixels, 0, context->pixelsize, context->pixels);
+	(*env)->SetIntArrayRegion(env, context->obj_pixels, 0, context->pixelsize, context->pixels);    // !!! (j array, start, len, c array)
 
 	// notifyCallbacks();
 	(*env)->CallVoidMethod(env, context->obj, context->notifyCallbacks);
