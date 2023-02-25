@@ -17,10 +17,10 @@
 #include "extbuffer.h"
 #include "fft.h"
 
-#define MIN_FRAMERATE (55)
+#define MIN_FRAMERATE (10)
 #define MIN_HEIGHT (590)
-#define MAX_FRAMERATE (87)
-#define MAX_HEIGHT (1500)
+#define MAX_FRAMERATE (65)
+#define MAX_HEIGHT (2000)
 #define FRAMES_TO_CAPTURE (3.1)
 
 void autocorrelate(extbuffer_t * buff, float * data, int size) {
