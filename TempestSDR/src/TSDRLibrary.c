@@ -540,9 +540,10 @@ end:
  void set_internal_samplerate(tsdr_lib_t * tsdr, uint32_t samplerate) {
 		tsdr->samplerate = samplerate;
 
-		const double real_width = samplerate / (tsdr->refreshrate * tsdr->height);
+		const double real_width = samplerate / (tsdr->refreshrate * tsdr->height);    // !!! the real width is not set by UI, but instead by sample
 
-		tsdr->width = (int) 2*real_width;
+		tsdr->width = (int) 2*real_width;   // ??? why double it?
+		// tsdr->width = (int) real_width;
 		tsdr->pixelrate = tsdr->width * tsdr->height * tsdr->refreshrate;
 
 		if (tsdr->samplerate != 0 && tsdr->pixelrate != 0)

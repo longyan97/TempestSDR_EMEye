@@ -43,7 +43,7 @@ namespace po = boost::program_options;
 
 uint32_t req_freq = 105e6;
 float req_gain = 1;
-double req_rate = 25e6;
+double req_rate = 5e6;
 volatile int is_running = 0;
 
 EXTERNC TSDRPLUGIN_API void __stdcall tsdrplugin_getName(char * name) {
@@ -110,8 +110,16 @@ EXTERNC TSDRPLUGIN_API int __stdcall tsdrplugin_init(const char * params) {
 		usrp->set_clock_source(ref);
 		if (vm.count("tsrc")) usrp->set_time_source(tsrc);
 
+
+		// std::cout << boost::format(
+		// 				"Desired sample rate: %f"
+		// 		) % req_rate << std::endl;
 		usrp->set_rx_rate(req_rate);
 		req_rate = usrp->get_rx_rate();
+		std::cout << boost::format(
+						"Sample rate: %f"
+		) % req_rate << std::endl;
+
 
 		//set the rx center frequency
 		usrp->set_rx_freq(req_freq);
