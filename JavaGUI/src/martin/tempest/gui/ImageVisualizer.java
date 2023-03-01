@@ -111,9 +111,6 @@ public class ImageVisualizer extends JPanel {
 				
 				im_width = desired_image_width;
 				im_height = todraw.getHeight();
-
-				disp_real_width = todraw.getWidth();
-				disp_real_height = todraw.getHeight();
 				
 				todraw_width = width;
 				todraw_height = height;
@@ -127,7 +124,7 @@ public class ImageVisualizer extends JPanel {
 				todraw_y = (height - todraw_height) / 2;	
 			}
 			
-			g.setColor(Color.BLACK);
+			g.setColor(Color.WHITE);
 			g.fillRect(0, 0, width, height);
 			
 			synchronized (locker) {
@@ -149,6 +146,8 @@ public class ImageVisualizer extends JPanel {
 			fps = (int) Math.round((1000.0 * COUNT_TO_AVG) / (double) (now - prev));
 			count = 0;
 			prev = now;
+			disp_real_width = todraw.getWidth();
+			disp_real_height = todraw.getHeight();
 		}
 		
 		// g.setColor(Color.white);

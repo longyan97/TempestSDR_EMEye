@@ -156,10 +156,10 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	
 	private int image_width = 1;
 	
-	private double ratio_crop_left = 50;
-	private double ratio_crop_right = 100;
-	private double ratio_crop_up = 300;
-	private double ratio_crop_down = 300;
+	private double ratio_crop_left = 0;
+	private double ratio_crop_right = 0;
+	private double ratio_crop_up = 0;
+	private double ratio_crop_down = 0;
 	
 	/**
 	 * Launch the application.
@@ -988,13 +988,13 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		ratio_crop_left = slCropLeft.getValue() / 100.0f;
 	}
 	private void onCropRightChanged() {
-		ratio_crop_left = slCropRight.getValue() / 100.0f;
+		ratio_crop_right = slCropRight.getValue() / 100.0f;
 	}
 	private void onCropUpChanged() {
-		ratio_crop_left = slCropUp.getValue() / 100.0f;
+		ratio_crop_up = slCropUp.getValue() / 100.0f;
 	}
 	private void onCropDownChanged() {
-		ratio_crop_left = slCropDown.getValue() / 100.0f;
+		ratio_crop_down = slCropDown.getValue() / 100.0f;
 	}
 	
 
@@ -1214,9 +1214,9 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		// visualizer.drawImage(frame, image_width);
 		// !!! crop the image to get rid of blanking between lines and frames 
 		int crop_left = (int) (ratio_crop_left * frame.getWidth());
-		int crop_right = (int) (ratio_crop_left * frame.getWidth());
-		int crop_up = (int) (ratio_crop_left * frame.getHeight());
-		int crop_down = (int) (ratio_crop_left * frame.getHeight());
+		int crop_right = (int) (ratio_crop_right * frame.getWidth());
+		int crop_up = (int) (ratio_crop_up * frame.getHeight());
+		int crop_down = (int) (ratio_crop_down * frame.getHeight());
 
 		BufferedImage disp_frame = frame.getSubimage(crop_left, crop_up, frame.getWidth()-crop_right-crop_left, frame.getHeight()-crop_down-crop_up);
 		visualizer.drawImage(disp_frame, image_width);
