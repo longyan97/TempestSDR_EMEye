@@ -27,7 +27,7 @@ import javax.swing.JPanel;
 public class ImageVisualizer extends JPanel {
 	
 	private static final long serialVersionUID = -6754436015453195809L;
-	private static final int COUNT_TO_AVG = 50;
+	private static final int COUNT_TO_AVG = 30;
 	private static final int OSD_SIZE_FRACT_OF_HEIGHT = 20;
 	
 	private Font default_osd_font = null;
@@ -44,6 +44,7 @@ public class ImageVisualizer extends JPanel {
 	private String OSD;
 	
 	private int width = -1, height = -1, nwidth = 1, nheight = 1, im_width = -1, im_height = -1, todraw_width = 1, todraw_height = 1, todraw_x = 0, todraw_y = 0;
+	private int disp_real_width = -1, disp_real_height = -1;
 	private int desired_image_width = -1;
 	
 	private Graphics theonewith_hints = null;
@@ -110,6 +111,9 @@ public class ImageVisualizer extends JPanel {
 				
 				im_width = desired_image_width;
 				im_height = todraw.getHeight();
+
+				disp_real_width = todraw.getWidth();
+				disp_real_height = todraw.getHeight();
 				
 				todraw_width = width;
 				todraw_height = height;
@@ -147,10 +151,10 @@ public class ImageVisualizer extends JPanel {
 			prev = now;
 		}
 		
-		g.setColor(Color.white);
-		g.fillRect(width-60, 0, 60, 20);
-		g.setColor(Color.black);
-		g.drawString(fps+" fps", width-60, 15);
+		// g.setColor(Color.white);
+		// g.fillRect(width-60, 0, 60, 20);
+		g.setColor(Color.red);
+		g.drawString("width:" + disp_real_width + ", height:" + disp_real_height + ", fps:" + fps, width-240, 15);
 	}
 	
 	private void drawOSD(Graphics g) {
