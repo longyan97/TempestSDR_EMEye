@@ -154,6 +154,10 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	// private boolean video_mode_change_manually_triggered = false;
 	
 	private int image_width = 1;
+	private int crop_left = 100;
+	private int crop_right = 100;
+	private int crop_up = 300;
+	private int crop_down = 300;
 	
 	/**
 	 * Launch the application.
@@ -1116,7 +1120,12 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			}
 			
 		}
-		visualizer.drawImage(frame, image_width);
+
+
+		// visualizer.drawImage(frame, image_width);
+		// !!! crop the image to get rid of blanking between lines and frames 
+		BufferedImage disp_frame = frame.getSubimage(crop_left, crop_up, crop_right - crop_left, crop_down - crop_up);
+		visualizer.drawImage(disp_frame, image_width);
 	
 	}
 
