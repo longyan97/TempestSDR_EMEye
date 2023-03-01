@@ -17,6 +17,8 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
@@ -127,6 +129,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private Rectangle visualizer_bounds;
 	private double framerate = 25;
 	private JTextField txtFramerate;
+	private JTextField txtShearX;
 	private HoldButton btnLowerFramerate, btnHigherFramerate, btnUp, btnDown, btnLeft, btnRight;
 	private JPanel pnInputDeviceSettings;
 	private ParametersToggleButton tglbtnAutoPosition, tglbtnPllFramerate, tglbtnAutocorrPlots, tglbtnSuperBandwidth;
@@ -160,6 +163,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private double ratio_crop_right = 0;
 	private double ratio_crop_up = 0;
 	private double ratio_crop_down = 0;
+	private double shearX = 0;
 	
 	/**
 	 * Launch the application.
@@ -594,6 +598,33 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		frmTempestSdr.getContentPane().add(slCropDown);
 
 
+		JLabel lblShearX = new JLabel("ShearX:");
+		lblShearX.setBounds(900, 388, 65, 16);
+		frmTempestSdr.getContentPane().add(lblShearX);
+		lblShearX.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtShearX = new JTextField();
+		txtShearX.setBounds(980, 388, 65, 16);
+		frmTempestSdr.getContentPane().add(txtShearX);
+		txtShearX.setText(""+0);
+		txtShearX.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				onShearXChanged();
+			}
+		});
+		txtShearX.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent evt) {
+				if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+				onShearXChanged();
+			}
+		});
+		txtShearX.setColumns(5);
+
+
+
+
 
 		lblFrames = new JLabel("00");
 		lblFrames.setToolTipText("The number of  runs of the autocorrelation averaging");
@@ -1000,6 +1031,18 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 
 
 
+	private void onShearXChanged() {
+		try {
+			final Double val = Double.parseDouble(txtShearX.getText().trim());
+			if (val != null) {
+				shearX = val;
+			}
+		} catch (NumberFormatException e) {}
+
+	}
+
+
+
 
 
 
@@ -1218,7 +1261,17 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		int crop_up = (int) (ratio_crop_up * frame.getHeight());
 		int crop_down = (int) (ratio_crop_down * frame.getHeight());
 
-		BufferedImage disp_frame = frame.getSubimage(crop_left, crop_up, frame.getWidth()-crop_right-crop_left, frame.getHeight()-crop_down-crop_up);
+		BufferedImage cropped_frame = frame.getSubimage(crop_left, crop_up, frame.getWidth()-crop_right-crop_left, frame.getHeight()-crop_down-crop_up);
+		BufferedImage disp_frame = new BufferedImage(cropped_frame.getWidth(), cropped_frame.getHeight(), cropped_frame.getType());
+		if (shearX != 0){
+			AffineTransform at = new AffineTransform();
+			at.shear(shearX, 0);
+			AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+			disp_frame = scaleOp.filter(cropped_frame, disp_frame);
+		} else {
+			disp_frame = cropped_frame;
+		}
+		
 		visualizer.drawImage(disp_frame, image_width);
 	
 	}
