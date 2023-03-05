@@ -836,6 +836,9 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			mSdrlib.setParam(PARAM.LOW_PASS_BEFORE_SYNC, chckbxmntmLowpassBeforeSync.isSelected() ? 1 : 0);
 			mSdrlib.setParam(PARAM.AUTOGAIN_AFTER_PROCESSING, chckbxmntmAutoCorrectAfterProc.isSelected() ? 1 : 0);
 		} catch (TSDRException e1) {}
+
+
+		System.out.println( "GUI Ready" );
 	}
 	
 	// private void onVideoModeSelected(final int modeid) {
@@ -929,6 +932,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		// 	setFrameRate(fps);
 		// }
 
+		setFrameRate(fps);
 		final int width = (Integer) spWidth.getValue();
 		onResolutionChange(width, height, framerate, 0);
 	}
@@ -1479,6 +1483,8 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			
 			final double fps = frame_plotter.getSelectedValue();
 			final int height = roundData(line_plotter.getSelectedValue());
+			System.out.println( "fps plotter selected. fps:" + fps + ", height:"+height);
+
 			onResolutionChange(fps, height, "Chosen %s");
 		}
 
@@ -1518,6 +1524,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		public void executeIdSelected(int sel_id, int offset, long samplerate) {
 			if (plot_change_from_auto) return;
 			final int height = roundData(line_plotter.getSelectedValue());
+			System.out.println( "height plotter selected: " + height);
 			onResolutionChange(framerate, height, "Chosen %s");
 		}
 
