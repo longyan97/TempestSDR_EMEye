@@ -121,6 +121,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private JSlider slCropLeft, slCropRight, slCropUp, slCropDown;
 	private JLabel lblGain;
 	private JButton btnStartStop;
+	private JButton btnRecordData;
 	private final TSDRLibrary mSdrlib;
 	private ImageVisualizer visualizer;
 	private PlotVisualizer line_plotter, frame_plotter;
@@ -129,7 +130,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private Rectangle visualizer_bounds;
 	private double framerate = 25;
 	private JTextField txtFramerate;
-	private JTextField txtShearX;
+	private JTextField txtShearX, txtRecStep;
 	private HoldButton btnLowerFramerate, btnHigherFramerate, btnUp, btnDown, btnLeft, btnRight;
 	private JPanel pnInputDeviceSettings;
 	private ParametersToggleButton tglbtnAutoPosition, tglbtnPllFramerate, tglbtnAutocorrPlots, tglbtnSuperBandwidth;
@@ -164,6 +165,11 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private double ratio_crop_up = 0;
 	private double ratio_crop_down = 0;
 	private double shearX = 0;
+	private boolean isrecdata = false;
+	private double recdata_count = 0;
+	private int recdata_step = 10;
+	private String recdata_folder = "";
+	private boolean sizeFirstFrame = true;
 	
 	/**
 	 * Launch the application.
@@ -417,13 +423,13 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		// cbVideoModes.setModel(new DefaultComboBoxModel(videomodes));
 		// if (closest_videomode_id != -1 && closest_videomode_id < videomodes.length && closest_videomode_id >= 0) cbVideoModes.setSelectedIndex(closest_videomode_id);
 		
-		JLabel lblWidth = new JLabel("Width:");
-		lblWidth.setBounds(581, 100, 65, 16);
+		JLabel lblWidth = new JLabel("Disp Width");
+		lblWidth.setBounds(581, 100, 90, 16);
 		frmTempestSdr.getContentPane().add(lblWidth);
 		lblWidth.setHorizontalAlignment(SwingConstants.RIGHT);
 		
-		JLabel lblHeight = new JLabel("Height:");
-		lblHeight.setBounds(581, 127, 65, 16);
+		JLabel lblHeight = new JLabel("Real Height");
+		lblHeight.setBounds(581, 127, 90, 16);
 		frmTempestSdr.getContentPane().add(lblHeight);
 		lblHeight.setHorizontalAlignment(SwingConstants.RIGHT);
 		
@@ -433,7 +439,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		lblFramerate.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		spWidth = new JSpinner();
-		spWidth.setBounds(651, 97, 102, 22);
+		spWidth.setBounds(691, 97, 102, 22);
 		frmTempestSdr.getContentPane().add(spWidth);
 		spWidth.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
@@ -445,7 +451,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		spWidth.setModel(new SpinnerNumberModel(width_initial, 1, 10000, 1));
 		
 		spHeight = new JSpinner();
-		spHeight.setBounds(651, 124, 102, 22);
+		spHeight.setBounds(691, 124, 102, 22);
 		frmTempestSdr.getContentPane().add(spHeight);
 		spHeight.addChangeListener(new ChangeListener() {
 			private Integer oldheight = null;
@@ -566,6 +572,21 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 
 
 
+
+
+
+
+		btnRecordData= new JButton("Record Data");
+		btnRecordData.setBounds(900, 33, 209, 25);
+		btnRecordData.setEnabled(true);
+		btnRecordData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				performRecData();
+			}
+		});
+		frmTempestSdr.getContentPane().add(btnRecordData);
+
+
 		JLabel lblCropLeft = new JLabel("L-crop:");
 		JLabel lblCropRight = new JLabel("R-crop:");
 		JLabel lblCropUp = new JLabel("U-crop:");
@@ -621,6 +642,31 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			}
 		});
 		txtShearX.setColumns(5);
+
+
+		JLabel lblRecStep = new JLabel("Rec Frame Step:");
+		lblRecStep.setBounds(900, 65, 120, 16);
+		frmTempestSdr.getContentPane().add(lblRecStep);
+		lblRecStep.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		txtRecStep = new JTextField();
+		txtRecStep.setBounds(1030, 65, 65, 16);
+		frmTempestSdr.getContentPane().add(txtRecStep);
+		txtRecStep.setText(""+recdata_step);
+		txtRecStep.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				onRecStepChanged();
+			}
+		});
+		txtRecStep.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent evt) {
+				if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+				onRecStepChanged();
+			}
+		});
+		txtRecStep.setColumns(5);
 
 
 
@@ -854,6 +900,38 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			prefs.putInt(PREF_AREA_AROUND_MOUSE, area_around_mouse);
 		} catch (Throwable t) {};
 	}
+
+
+
+
+	private void performRecData() {
+
+
+		if (!isrecdata) {
+
+			isrecdata = true;
+			recdata_count = 0;
+			try {
+				recdata_folder = "EMEye_Data" + File.separator +  (new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")).format(new Date());
+				File file = new File( recdata_folder );
+				file.mkdirs();
+				System.out.println("Created data folder: "+file.getAbsolutePath());
+				
+			} catch (Throwable e) {
+				e.printStackTrace();
+			}
+
+			btnRecordData.setText("Stop Data Rec");
+
+		} else {
+			isrecdata = false;
+			btnRecordData.setText("Record Data");
+			sizeFirstFrame = true;
+		}
+
+
+
+	}
 	
 	private void performStartStop() {
 		
@@ -865,6 +943,10 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 					try {
 						if (!mSdrlib.isRunning()) btnStartStop.setEnabled(false);
 						mSdrlib.stop();
+						if (isrecdata) {
+							isrecdata = false;
+							btnRecordData.setText("RecordData");
+						} 
 					} catch (TSDRException e) {
 						displayException(frmTempestSdr, e);
 					}
@@ -1021,15 +1103,19 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 
 	private void onCropLeftChanged() {
 		ratio_crop_left = slCropLeft.getValue() / 100.0f;
+		sizeFirstFrame = true;
 	}
 	private void onCropRightChanged() {
 		ratio_crop_right = slCropRight.getValue() / 100.0f;
+		sizeFirstFrame = true;
 	}
 	private void onCropUpChanged() {
 		ratio_crop_up = slCropUp.getValue() / 100.0f;
+		sizeFirstFrame = true;
 	}
 	private void onCropDownChanged() {
 		ratio_crop_down = slCropDown.getValue() / 100.0f;
+		sizeFirstFrame = true;
 	}
 	
 
@@ -1041,6 +1127,16 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			if (val != null) {
 				shearX = val;
 			}
+		} catch (NumberFormatException e) {}
+
+	}
+
+	private void onRecStepChanged() {
+		try {
+			final Integer val = Integer.parseInt(txtRecStep.getText().trim());
+			if (val != null) {
+				recdata_step = val;
+			} 
 		} catch (NumberFormatException e) {}
 
 	}
@@ -1258,7 +1354,6 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		}
 
 
-		// visualizer.drawImage(frame, image_width);
 		// !!! crop the image to get rid of blanking between lines and frames 
 		int crop_left = (int) (ratio_crop_left * frame.getWidth());
 		int crop_right = (int) (ratio_crop_right * frame.getWidth());
@@ -1277,6 +1372,35 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		}
 		
 		visualizer.drawImage(disp_frame, image_width);
+
+		if (isrecdata) {
+			recdata_count ++;
+			if (recdata_count % recdata_step == 0) {
+				double ratio_disp_HoverW = (double) disp_frame.getHeight() / (double) image_width;
+				int save_width = disp_frame.getWidth();
+				int save_height = (int) (ratio_disp_HoverW*disp_frame.getWidth());
+				if (sizeFirstFrame) {
+					System.out.println("Save image, width: " + save_width + " height: " + save_height);
+					sizeFirstFrame = false;
+				}
+				final BufferedImage out_frame = resize(disp_frame, save_width, save_height);   // !!! Downsample it based on actual width
+				// final BufferedImage out_frame = disp_frame;
+				new Thread(new Runnable() {
+					public void run(){
+						try {
+							final String filename = recdata_folder + File.separator + "frame_" + String.format("%.0f", recdata_count) + "."+SNAPSHOT_FORMAT;
+							final File outputfile = new File(filename);
+							ImageIO.write(out_frame, SNAPSHOT_FORMAT, outputfile);
+							
+						} catch (Throwable e) {
+							System.out.println("Cannot save frame " + recdata_count);
+							e.printStackTrace();
+						}
+					}
+				}).start();
+
+			}
+		}
 	
 	}
 
