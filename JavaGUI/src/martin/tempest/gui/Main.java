@@ -172,8 +172,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private boolean sizeFirstFrame = true;
 
 	private JComboBox cbImageRecMode;
-	private int[] imageRecModes = {0, 1, 2};
-	private String[] imageRecNames = {"Raw Frame", "Transferred", "Trans. Downsamp."};
+	private String[] imageRecNames = {"Raw Frame", "Displayed", "Display Downsampled"};
 	
 	/**
 	 * Launch the application.
@@ -653,6 +652,11 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		cbImageRecMode.setBounds(900, 65, 209, 22);
 		frmTempestSdr.getContentPane().add(cbImageRecMode);
 		cbImageRecMode.setSelectedIndex(0);
+		cbImageRecMode.addActionListener (new ActionListener () {
+			public void actionPerformed(ActionEvent e) {
+				sizeFirstFrame = true;
+			}
+		});
 
 
 
@@ -932,7 +936,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
-			System.out.println("rec mode"+cbImageRecMode.getSelectedItem() + cbImageRecMode.getSelectedIndex());
+			System.out.println("rec mode "+cbImageRecMode.getSelectedIndex() + ": " + cbImageRecMode.getSelectedItem());
 			btnRecordData.setText("Stop Data Rec");
 
 		} else {
@@ -1347,6 +1351,16 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 
 	@Override
 	public void onFrameReady(TSDRLibrary lib, BufferedImage frame) {
+
+		// get rid of the redundant rgb channel data
+		BufferedImage newImage = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_BYTE_GRAY);
+		Graphics2D g = newImage.createGraphics();
+		g.drawImage(frame, 0, 0, frame.getWidth(), frame.getHeight(), null);
+		g.dispose();
+		frame = newImage;
+
+
+		// depracated snapshot function. DOn't use this 
 		if (snapshot) {
 			snapshot = false;
 			try {
@@ -1384,36 +1398,78 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		}
 		
 		visualizer.drawImage(disp_frame, image_width);
+		
+
 
 		if (isrecdata) {
 			recdata_count ++;
 			if (recdata_count % recdata_step == 0) {
 
+				final String filename = recdata_folder + File.separator + "frame_" + String.format("%.0f", recdata_count) + "."+SNAPSHOT_FORMAT;
+				final File outputfile = new File(filename);
+				final BufferedImage out_frame;
 
-				double ratio_disp_HoverW = (double) disp_frame.getHeight() / (double) image_width;
-				int save_width = disp_frame.getWidth();
-				int save_height = (int) (ratio_disp_HoverW*disp_frame.getWidth());
-				if (sizeFirstFrame) {
-					System.out.println("Save image, width: " + save_width + " height: " + save_height);
-					sizeFirstFrame = false;
-				}
-				final BufferedImage out_frame = resize(disp_frame, save_width, save_height);   // !!! Downsample it based on actual width
+				switch (cbImageRecMode.getSelectedIndex()) {
 
-
-				// final BufferedImage out_frame = disp_frame;
-				new Thread(new Runnable() {
-					public void run(){
-						try {
-							final String filename = recdata_folder + File.separator + "frame_" + String.format("%.0f", recdata_count) + "."+SNAPSHOT_FORMAT;
-							final File outputfile = new File(filename);
-							ImageIO.write(out_frame, SNAPSHOT_FORMAT, outputfile);
-							
-						} catch (Throwable e) {
-							System.out.println("Cannot save frame " + recdata_count);
-							e.printStackTrace();
+					case 0:     // raw received frame, no transformation 
+					out_frame = frame;
+					new Thread(new Runnable() {
+						public void run(){
+							try {
+								ImageIO.write(out_frame, SNAPSHOT_FORMAT, outputfile);
+							} catch (Throwable e) {
+								System.out.println("Cannot save frame " + recdata_count);
+								e.printStackTrace();
+							}
 						}
+					}).start();
+					if (sizeFirstFrame) {
+						System.out.println("Save image, width: " + out_frame.getWidth() + " height: " + out_frame.getHeight());
+						sizeFirstFrame = false;
 					}
-				}).start();
+					break;
+
+
+					case 1:     // displayed frame
+						out_frame = resize(disp_frame, image_width, disp_frame.getHeight());;
+						new Thread(new Runnable() {
+							public void run(){
+								try {
+									ImageIO.write(out_frame, SNAPSHOT_FORMAT, outputfile);
+								} catch (Throwable e) {
+									System.out.println("Cannot save frame " + recdata_count);
+									e.printStackTrace();
+								}
+							}
+						}).start();
+						if (sizeFirstFrame) {
+							System.out.println("Save image, width: " + out_frame.getWidth() + " height: " + out_frame.getHeight());
+							sizeFirstFrame = false;
+						}
+						break;
+
+					case 2:     // displayed downsampled
+						double ratio_disp_HoverW = (double) disp_frame.getHeight() / (double) image_width;
+						int save_width = disp_frame.getWidth();
+						int save_height = (int) (ratio_disp_HoverW*disp_frame.getWidth());
+
+						out_frame = resize(disp_frame, save_width, save_height);   // !!! Downsample it based on actual width
+						new Thread(new Runnable() {
+							public void run(){
+								try {
+									ImageIO.write(out_frame, SNAPSHOT_FORMAT, outputfile);
+								} catch (Throwable e) {
+									System.out.println("Cannot save frame " + recdata_count);
+									e.printStackTrace();
+								}
+							}
+						}).start();
+						if (sizeFirstFrame) {
+							System.out.println("Save image, width: " + out_frame.getWidth() + " height: " + out_frame.getHeight());
+							sizeFirstFrame = false;
+						}
+						break;
+				}
 
 
 

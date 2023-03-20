@@ -206,21 +206,22 @@ float * syncdetector_run(syncdetector_t * sy, tsdr_lib_t * tsdr, float * data, f
 
 		return outputdata;
 	} else {
-#if PIXEL_SPECIAL_COLOURS_ENABLED
-		if (greenlines && modify_data_allowed) {
-			verticalline(sy->db_x.dx, data, width, height, PIXEL_SPECIAL_VALUE_G);
-			horizontalline(sy->db_y.dx, data, width, height, PIXEL_SPECIAL_VALUE_G);
-			return data;
-		} else if (greenlines && !modify_data_allowed) {
-			memcpy(outputdata, data, width * height * sizeof(float));
-			verticalline(sy->db_x.dx, outputdata, width, height, PIXEL_SPECIAL_VALUE_G);
-			horizontalline(sy->db_y.dx, outputdata, width, height, PIXEL_SPECIAL_VALUE_G);
-			return outputdata;
-		} else
-			return data;
-#else
+// #if PIXEL_SPECIAL_COLOURS_ENABLED
+// 		if (greenlines && modify_data_allowed) {
+// 			verticalline(sy->db_x.dx, data, width, height, PIXEL_SPECIAL_VALUE_G);
+// 			horizontalline(sy->db_y.dx, data, width, height, PIXEL_SPECIAL_VALUE_G);
+// 			return data;
+// 		} else if (greenlines && !modify_data_allowed) {
+// 			memcpy(outputdata, data, width * height * sizeof(float));
+// 			verticalline(sy->db_x.dx, outputdata, width, height, PIXEL_SPECIAL_VALUE_G);
+// 			horizontalline(sy->db_y.dx, outputdata, width, height, PIXEL_SPECIAL_VALUE_G);
+// 			return outputdata;
+// 		} else
+// 			return data;
+// #else
+// 		return data;
+// #endif
 		return data;
-#endif
 	}
 
 }
