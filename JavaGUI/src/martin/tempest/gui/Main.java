@@ -23,7 +23,7 @@ import java.awt.image.AffineTransformOp;
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-// import javax.swing.JComboBox;
+import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -31,7 +31,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.JTextField;
-// import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 
 import martin.tempest.core.TSDRLibrary;
 import martin.tempest.core.TSDRLibrary.PARAM;
@@ -170,6 +170,10 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private int recdata_step = 10;
 	private String recdata_folder = "";
 	private boolean sizeFirstFrame = true;
+
+	private JComboBox cbImageRecMode;
+	private int[] imageRecModes = {0, 1, 2};
+	private String[] imageRecNames = {"Raw Frame", "Transferred", "Trans. Downsamp."};
 	
 	/**
 	 * Launch the application.
@@ -417,11 +421,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		btnReset.setBounds(749, 417, 41, 22);
 		frmTempestSdr.getContentPane().add(btnReset);
 		
-		// cbVideoModes = new JComboBox();
-		// cbVideoModes.setBounds(581, 70, 209, 22);
-		// frmTempestSdr.getContentPane().add(cbVideoModes);
-		// cbVideoModes.setModel(new DefaultComboBoxModel(videomodes));
-		// if (closest_videomode_id != -1 && closest_videomode_id < videomodes.length && closest_videomode_id >= 0) cbVideoModes.setSelectedIndex(closest_videomode_id);
+
 		
 		JLabel lblWidth = new JLabel("Disp Width");
 		lblWidth.setBounds(581, 100, 90, 16);
@@ -576,16 +576,6 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 
 
 
-		btnRecordData= new JButton("Record Data");
-		btnRecordData.setBounds(900, 33, 209, 25);
-		btnRecordData.setEnabled(true);
-		btnRecordData.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				performRecData();
-			}
-		});
-		frmTempestSdr.getContentPane().add(btnRecordData);
-
 
 		JLabel lblCropLeft = new JLabel("L-crop:");
 		JLabel lblCropRight = new JLabel("R-crop:");
@@ -644,13 +634,35 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		txtShearX.setColumns(5);
 
 
+
+
+
+
+		btnRecordData= new JButton("Record Data");
+		btnRecordData.setBounds(900, 33, 209, 25);
+		btnRecordData.setEnabled(true);
+		btnRecordData.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				performRecData();
+			}
+		});
+		frmTempestSdr.getContentPane().add(btnRecordData);
+
+
+		cbImageRecMode = new JComboBox(imageRecNames);
+		cbImageRecMode.setBounds(900, 65, 209, 22);
+		frmTempestSdr.getContentPane().add(cbImageRecMode);
+		cbImageRecMode.setSelectedIndex(0);
+
+
+
 		JLabel lblRecStep = new JLabel("Rec Frame Step:");
-		lblRecStep.setBounds(900, 65, 120, 16);
+		lblRecStep.setBounds(900, 90, 120, 16);
 		frmTempestSdr.getContentPane().add(lblRecStep);
 		lblRecStep.setHorizontalAlignment(SwingConstants.RIGHT);
 		
 		txtRecStep = new JTextField();
-		txtRecStep.setBounds(1030, 65, 65, 16);
+		txtRecStep.setBounds(1030, 90, 65, 16);
 		frmTempestSdr.getContentPane().add(txtRecStep);
 		txtRecStep.setText(""+recdata_step);
 		txtRecStep.addFocusListener(new FocusAdapter() {
@@ -920,7 +932,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
-
+			System.out.println("rec mode"+cbImageRecMode.getSelectedItem() + cbImageRecMode.getSelectedIndex());
 			btnRecordData.setText("Stop Data Rec");
 
 		} else {
@@ -1376,6 +1388,8 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		if (isrecdata) {
 			recdata_count ++;
 			if (recdata_count % recdata_step == 0) {
+
+
 				double ratio_disp_HoverW = (double) disp_frame.getHeight() / (double) image_width;
 				int save_width = disp_frame.getWidth();
 				int save_height = (int) (ratio_disp_HoverW*disp_frame.getWidth());
@@ -1384,6 +1398,8 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 					sizeFirstFrame = false;
 				}
 				final BufferedImage out_frame = resize(disp_frame, save_width, save_height);   // !!! Downsample it based on actual width
+
+
 				// final BufferedImage out_frame = disp_frame;
 				new Thread(new Runnable() {
 					public void run(){
@@ -1398,6 +1414,8 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 						}
 					}
 				}).start();
+
+
 
 			}
 		}
