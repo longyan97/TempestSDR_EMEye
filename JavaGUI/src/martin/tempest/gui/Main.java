@@ -84,7 +84,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private final static int AUTO_FRAMERATE_CONVERGANCE_ITERATIONS = 3;
 	
 	private final static int FRAMERATE_SIGNIFICANT_FIGURES = 8;
-	private final static long FREQUENCY_STEP = 5000000;
+	private final static long FREQUENCY_STEP = 1000000;
 	
 	private final static double FRAMERATE_MIN_CHANGE = 1.0/Math.pow(10, FRAMERATE_SIGNIFICANT_FIGURES);
 	private final static String FRAMERATE_FORMAT = "%."+FRAMERATE_SIGNIFICANT_FIGURES+"f";

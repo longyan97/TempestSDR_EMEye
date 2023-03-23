@@ -295,6 +295,25 @@ void process(float *buf, uint64_t items_count, void *ctx, int64_t samples_droppe
 		dsp_dropped_compensation_add(&context->dsp_device_dropped, &context->circbuf_device_to_decimation, buf, size2, block);
 	}
 
+
+
+	
+	// // !!! write the iq data to file 
+	
+	// FILE *fout;
+	// fout = fopen("./EMEye_Data/dat.iq","a");
+
+	// if(fout == NULL)
+	// {
+	// 	printf("Error!");   
+	// 	exit(1);             
+	// }
+
+	// fwrite( &buf, 4, size2, fout );
+	// fclose(fout);
+
+
+
 }
 
 void decimatingthread(void * ctx) {
