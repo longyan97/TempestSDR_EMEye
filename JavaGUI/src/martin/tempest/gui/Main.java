@@ -130,7 +130,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private Rectangle visualizer_bounds;
 	private double framerate = 25;
 	private JTextField txtFramerate;
-	private JTextField txtShearX, txtRecStep;
+	private JTextField txtShearX, txtRecStep, txtRecName;
 	private HoldButton btnLowerFramerate, btnHigherFramerate, btnUp, btnDown, btnLeft, btnRight;
 	private JPanel pnInputDeviceSettings;
 	private ParametersToggleButton tglbtnAutoPosition, tglbtnPllFramerate, tglbtnAutocorrPlots, tglbtnSuperBandwidth;
@@ -168,6 +168,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private boolean isrecdata = false;
 	private double recdata_count = 0;
 	private int recdata_step = 10;
+	private String rec_name = "";
 	private String recdata_folder = "";
 	private boolean sizeFirstFrame = true;
 
@@ -663,7 +664,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		JLabel lblRecStep = new JLabel("Rec Frame Step:");
 		lblRecStep.setBounds(900, 90, 120, 16);
 		frmTempestSdr.getContentPane().add(lblRecStep);
-		lblRecStep.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblRecStep.setHorizontalAlignment(SwingConstants.LEFT);
 		
 		txtRecStep = new JTextField();
 		txtRecStep.setBounds(1030, 90, 65, 16);
@@ -685,6 +686,31 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		txtRecStep.setColumns(5);
 
 
+
+
+		JLabel lblRecName = new JLabel("Name:");
+		lblRecName.setBounds(900, 110, 60, 16);
+		frmTempestSdr.getContentPane().add(lblRecName);
+		lblRecName.setHorizontalAlignment(SwingConstants.LEFT);
+		
+		txtRecName = new JTextField();
+		txtRecName.setBounds(970, 110, 140, 16);
+		frmTempestSdr.getContentPane().add(txtRecName);
+		txtRecName.setText(""+rec_name);
+		txtRecName.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusLost(FocusEvent e) {
+				onRecNameChanged();
+			}
+		});
+		txtRecName.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyReleased(KeyEvent evt) {
+				if(evt.getKeyCode() == KeyEvent.VK_ENTER)
+				onRecNameChanged();
+			}
+		});
+		txtRecName.setColumns(20);
 
 
 
@@ -928,7 +954,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			isrecdata = true;
 			recdata_count = 0;
 			try {
-				recdata_folder = "EMEye_Data" + File.separator +  (new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")).format(new Date());
+				recdata_folder = "EMEye_Data" + File.separator + rec_name + "_" + (new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")).format(new Date());
 				File file = new File( recdata_folder );
 				file.mkdirs();
 				System.out.println("Created data folder: "+file.getAbsolutePath());
@@ -1153,6 +1179,17 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			if (val != null) {
 				recdata_step = val;
 			} 
+		} catch (NumberFormatException e) {}
+
+	}
+
+
+	private void onRecNameChanged() {
+		try {
+			final String val = txtRecName.getText();
+			if (val != null) {
+				rec_name = val;
+			} else rec_name = "";
 		} catch (NumberFormatException e) {}
 
 	}
