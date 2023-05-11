@@ -1405,7 +1405,9 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 			recdata_count ++;
 			if (recdata_count % recdata_step == 0) {
 
-				final String filename = recdata_folder + File.separator + "frame_" + String.format("%.0f", recdata_count) + "."+SNAPSHOT_FORMAT;
+				final int freq = (int) Math.abs(((Long) spFrequency.getValue())/1000000.0d);
+				final String filename = recdata_folder + File.separator + "freq-" + freq +
+				"_frame-" + String.format("%.0f", recdata_count) + "."+SNAPSHOT_FORMAT;
 				final File outputfile = new File(filename);
 				final BufferedImage out_frame;
 
