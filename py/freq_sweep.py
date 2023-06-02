@@ -7,7 +7,7 @@ from time import sleep
 checkfolder = '/home/spqr/spqr/TempestSDR_EMEye/JavaGUI/EMEye_Data'
 
 
-i_start = 673    # the start frequncy 
+i_start = 30    # the start frequncy 
 i_end = 2000    # the end frequncy
 i_now = i_start
 
@@ -23,7 +23,7 @@ pyautogui.click()
 
 while i_now <= i_end:
 
-    sleep(6)    # time for each frequency
+    sleep(1)    # time for each frequency
 
 
     # move on to the next frequency

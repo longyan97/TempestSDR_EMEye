@@ -17,8 +17,8 @@ allfolders_prev = os.listdir(checkfolder)
 pyautogui.moveTo(3815, 800)   # the Record Data button
 pyautogui.click()
 
-i_start = 1429
-i_end =   3730  #6883
+i_start = 1
+i_end =   3000
 i_now = i_start
 
 restarted = []
