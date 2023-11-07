@@ -106,7 +106,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private final static String PREF_AUTOGAIN_AFTER_PROC = "auto_bf_proc";
 
 	private final SpinnerModel frequency_spinner_model = new SpinnerNumberModel(new Long(prefs.getLong(PREF_FREQ, 400000000)), new Long(0), new Long(2147483647), new Long(FREQUENCY_STEP));
-	
+
 	private JFrame frmTempestSdr;
 	private JFrame fullscreenframe;
 	private JDialog deviceframe;
@@ -289,6 +289,7 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 		spFrequency.setBounds(651, 356, 139, 22);
 		spFrequency.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
+				System.out.println("freq clicked");
 				onCenterFreqChange();
 			}
 		});
@@ -1108,13 +1109,19 @@ public class Main implements TSDRLibrary.FrameReadyCallback, TSDRLibrary.Incomin
 	private void onCenterFreqChange() {
 		final Long newfreq = (Long) spFrequency.getValue();
 		
-		if (newfreq == null || newfreq < 0) return;
+		if (newfreq == null || newfreq < 0){
+			System.out.println("null or negative freq");
+			return;
+		} 
+		// System.out.println("trying to set freq");
 		
 		try {
 			mSdrlib.setBaseFreq(newfreq);
 			visualizer.setOSD("Freq: "+newfreq+" Hz", OSD_TIME);
 			prefs.putLong(PREF_FREQ, newfreq);
+			// System.out.println("freq set");
 		} catch (TSDRException e) {
+			// System.out.println("freq exception");
 			displayException(frmTempestSdr, e);
 		}
 	}

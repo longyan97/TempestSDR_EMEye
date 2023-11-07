@@ -8,7 +8,7 @@ checkfolder = '/home/spqr/spqr/TempestSDR_EMEye/JavaGUI/EMEye_Data'
 
 
 i_start = 30    # the start frequncy 
-i_end = 2000    # the end frequncy
+i_end = 2100    # the end frequncy
 i_now = i_start
 
 
@@ -29,6 +29,7 @@ while i_now <= i_end:
     # move on to the next frequency
     pyautogui.moveTo(911, 489)
     pyautogui.click()
+
 
 
     allfolders = os.listdir(checkfolder)

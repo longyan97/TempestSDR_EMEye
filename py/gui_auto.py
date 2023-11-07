@@ -14,11 +14,10 @@ checkfolder = '/home/spqr/spqr/TempestSDR_EMEye/JavaGUI/EMEye_Data'
 allfolders_prev = os.listdir(checkfolder)
 
 
-pyautogui.moveTo(3815, 800)   # the Record Data button
-pyautogui.click()
+
 
 i_start = 1
-i_end =   3000
+i_end =  6000    
 i_now = i_start
 
 restarted = []
@@ -40,7 +39,7 @@ while i_now <= i_end:
     pyautogui.moveTo(1089, 169)
     pyautogui.click()     
 
-    sleep(2)     # Record for 3s. In the tempest_sdr GUI, use raw frame and a step of ~30
+    sleep(2)     # Record for 2s. In the tempest_sdr GUI, use raw frame and a step of ~30
 
     # stop image recording 
     pyautogui.moveTo(1089, 169)
